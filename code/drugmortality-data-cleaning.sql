@@ -56,6 +56,7 @@ ALTER TABLE drug_related_deaths
 ;
 
 -- Replace blank and inconsistent values --
+-- two missing age values, using median value to replace missing data --
 UPDATE drug_related_deaths
 SET age = 44
 WHERE age = ''
@@ -64,6 +65,24 @@ WHERE age = ''
 UPDATE drug_related_deaths
 SET sex = 'Unknown'
 WHERE sex NOT IN ('Male', 'Female')
+;
+
+UPDATE drug_related_deaths
+SET death_location = CASE
+	WHEN death_location = 'Hiospital' THEN 'Hospital'
+    WHEN death_location = 'Hospital - ER/Outpatient' THEN 'Hospital'
+    WHEN death_location = 'Hospital - Inpatient' THEN 'Hospital'
+    WHEN death_location = 'Hospital - Dead on Arrival' THEN 'Hospital'
+    WHEN death_location = 'Nursing Home' THEN 'Assisted Living'
+    WHEN death_location = 'Hospice Facility' THEN 'Assisted Living'
+    WHEN death_location = 'Hospice' THEN 'Assisted Living'
+    WHEN death_location = 'Convalescent Home' THEN 'Assisted Living'
+	WHEN death_location = 'Shelter' THEN 'Assisted Living'
+    WHEN death_location = 'Decedentâ€™s Home' THEN 'Residence'   
+    WHEN death_location = 'Decedent''s Home' THEN 'Residence'
+	WHEN death_location = 'Other (Specify)' THEN 'Other'
+    ELSE death_location
+END
 ;
 
 UPDATE drug_related_deaths
