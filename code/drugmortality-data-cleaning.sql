@@ -111,6 +111,21 @@ END
 ;
 
 UPDATE drug_related_deaths
+SET death_city = CASE
+	WHEN death_city = '6340' THEN 'Unknown'
+    WHEN death_city = 'N HAVEN' THEN 'NORTH HAVEN'
+    WHEN death_city = 'NEW CANNAN' THEN 'NEW CANAAN'
+    WHEN death_city = 'NO HAVEN' THEN 'NORTH HAVEN'
+    WHEN death_city = 'NORTH WINDAM' THEN 'NORTH WINDHAM'
+    WHEN death_city = 'STAFFORD SPGS' THEN 'STAFFORD SPRINGS'
+    WHEN death_city = 'W HAVEN' THEN 'WEST HAVEN'
+    WHEN death_city = 'WILLIAMNTIC' THEN 'WILLIMANTIC'
+    WHEN death_city = 'S GLASTONBURY' THEN 'SOUTH GLASTONBURY'
+    ELSE death_city
+END
+;
+
+UPDATE drug_related_deaths
 SET ethnicity = CASE
 	WHEN ethnicity = 'No, not Spanish/Hispanic/Latino' THEN 'Not Hispanic/Latino'
     WHEN ethnicity = 'n' THEN 'Not Hispanic/Latino'
@@ -224,4 +239,16 @@ END
 UPDATE drug_related_deaths
 SET death_coord = LEFT(death_coord, LENGTH(death_coord) - 1)
 WHERE death_coord IS NOT NULL
+;
+
+-- extract latitude and longitude from death location for future viz --
+ALTER TABLE drug_related_deaths
+	ADD COLUMN death_latitude DECIMAL(10, 6),
+	ADD COLUMN death_longitude DECIMAL(10,6)
+;
+
+UPDATE drug_related_deaths
+SET
+	death_latitude = TRIM(SUBSTRING_INDEX(death_coord, ',', 1)),
+    death_longitude = TRIM(SUBSTRING_INDEX(death_coord, ',', -1))
 ;
