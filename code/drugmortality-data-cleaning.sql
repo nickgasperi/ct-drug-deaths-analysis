@@ -185,6 +185,18 @@ SET
 	`opioid_any` = CASE WHEN `opioid_any` = '' THEN 'N' ELSE `opioid_any` END
 ;
 
+-- continue cleaning same columns, standardizing all records that indicate Yes --
+UPDATE drug_related_deaths
+SET
+	`fentanyl` = CASE WHEN `fentanyl` LIKE 'Y%' THEN 'Y' ELSE `fentanyl` END,
+    `ethanol` = CASE WHEN `ethanol` = 'P' THEN 'N' ELSE `ethanol` END,
+    `morphine_not_heroin` = CASE WHEN 
+		`morphine_not_heroin` LIKE 'N%' OR
+        `morphine_not_heroin` LIKE 'P%' OR
+        `morphine_not_heroin` LIKE 'S%'
+	THEN 'N' ELSE `morphine_not_heroin` END
+;
+
 -- Split columns --
 -- extract year from `date` into new column --
 ALTER TABLE drug_related_deaths
