@@ -1,19 +1,5 @@
 -- Exploratory Analysis --
-
--- # basic exploration --
--- residence state of deceased --
-SELECT
-	residence_state,
-	COUNT(*) AS residents,
-    COUNT(*) / (
-				SELECT COUNT(*)
-                FROM drug_related_deaths
-                ) AS pct_of_total
-FROM drug_related_deaths
-GROUP BY residence_state
-;
-
--- total deaths by year --
+-- deaths by year --
 SELECT
 	death_year,
 	COUNT(*) AS num_of_deaths
@@ -22,7 +8,7 @@ GROUP BY death_year
 ORDER BY death_year ASC
 ;
 
--- num & pct of deaths by year ranges --
+-- create year brackets --
 SELECT
 	CASE
 		WHEN death_year BETWEEN 2012 AND 2015 THEN '2012-2015'
@@ -40,7 +26,7 @@ GROUP BY death_year_bracket
 ORDER BY death_year_bracket ASC
 ;
 
--- # demographics: num & pct of deaths by demo groups --
+-- number and pct of deaths by demographic groups --
 -- race --
 SELECT
 	race,
@@ -75,7 +61,6 @@ SELECT
                 ) AS pct_of_total
 FROM drug_related_deaths
 GROUP BY ethnicity
-ORDER BY num_of_deaths DESC
 ;
 
 -- age --
@@ -86,7 +71,7 @@ SELECT
 FROM drug_related_deaths
 ;
 
--- num & pct of deaths by age brackets --
+-- create age brackets --
 SELECT
 	CASE
 		WHEN age < 18 THEN '0-18'
@@ -96,7 +81,7 @@ SELECT
         WHEN age > 64 THEN '65+'
         ELSE 'n/a'
 	END AS age_bracket,
-	COUNT(*) AS num_of_deaths,
+	COUNT(*) AS census,
     COUNT(*) / (
 				SELECT COUNT(*)
                 FROM drug_related_deaths
@@ -106,27 +91,8 @@ GROUP BY age_bracket
 ORDER BY age_bracket ASC
 ;
 
--- only people under 30 --
--- gender --
-SELECT
-    sex,
-    COUNT(*) AS num_of_deaths
-FROM drug_related_deaths
-WHERE age < 30
-GROUP BY sex
-;
-
--- race --
-SELECT
-	race,
-    COUNT(*) AS num_of_deaths
-FROM drug_related_deaths
-WHERE age < 30
-GROUP BY race
-;
-
--- # identify prevalent death locations --
--- where the overdose occurred --
+-- identify common  --
+-- location of death --
 SELECT
 	death_location,
     COUNT(*) AS num_of_deaths,
@@ -148,17 +114,7 @@ GROUP BY death_year
 ORDER BY death_year ASC
 ;
 
--- # deaths by city --
-SELECT
-	death_city,
-    COUNT(*) AS num_of_deaths
-FROM drug_related_deaths
-GROUP BY death_city
-ORDER BY num_of_deaths DESC
-;
-
--- # identify leading drug types --
--- num of deaths involving any opioid --
+-- type of drug --
 SELECT
 	opioid_any,
 	COUNT(*) AS num_of_deaths
@@ -166,16 +122,28 @@ FROM drug_related_deaths
 GROUP BY opioid_any
 ;
 
--- num of deaths involving heroin --
+-- heroin presence --
 SELECT COUNT(*) AS num_of_deaths
 FROM drug_related_deaths
 WHERE heroin = 'Y'
 ;
 
--- num of deaths involving fentanyl --
+-- fentanyl presence --
 SELECT COUNT(*) AS num_of_deaths
 FROM drug_related_deaths
 WHERE
 	fentanyl = 'Y' OR
     fentanyl_analogue = 'Y'
+;
+
+-- location --
+SELECT
+	residence_state,
+	COUNT(*) AS residents,
+    COUNT(*) / (
+				SELECT COUNT(*)
+                FROM drug_related_deaths
+                ) AS pct_of_total
+FROM drug_related_deaths
+GROUP BY residence_state
 ;
